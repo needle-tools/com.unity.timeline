@@ -40,7 +40,7 @@ namespace UnityEditor.Timeline
                     while (searchType != null)
                     {
                         // search our way up the runtime class hierarchy so we get the best match
-                        editorClassType = GetExactEditorClassForType(searchType);
+                        editorClassType = GetExactEditorClassForType(searchType, typeof(TEditorClass));
                         if (editorClassType != null)
                             break;
                         searchType = searchType.BaseType;
@@ -69,7 +69,7 @@ namespace UnityEditor.Timeline
                 return editorClass;
             }
 
-            private static Type GetExactEditorClassForType(Type type)
+            private static Type GetExactEditorClassForType(Type type, Type expectedEditorType = null)
             {
                 foreach (var subClass in SubClasses)
                 {
@@ -77,6 +77,7 @@ namespace UnityEditor.Timeline
                     var attr = (CustomTimelineEditorAttribute)Attribute.GetCustomAttribute(subClass, typeof(CustomTimelineEditorAttribute), false);
                     if (attr != null && attr.classToEdit == type)
                     {
+                        if (expectedEditorType != null && !expectedEditorType.IsAssignableFrom(subClass)) continue;
                         return subClass;
                     }
                 }
@@ -150,6 +151,14 @@ namespace UnityEditor.Timeline
         public static MarkerEditor GetDefaultMarkerEditor()
         {
             return SubClassCache<MarkerEditor>.DefaultInstance;
+        }
+
+        public static CustomCurvesEditor GetCustomCurvesView(TrackAsset track)
+        {
+            if (track == null)
+                throw new ArgumentNullException(nameof(track));
+            
+            return GetEditorForType<CustomCurvesEditor, TrackAsset>(track.GetType());
         }
     }
 }

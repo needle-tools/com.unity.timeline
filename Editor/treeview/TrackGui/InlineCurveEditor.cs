@@ -155,8 +155,14 @@ namespace UnityEditor.Timeline
             headerRect.width -= 4.0f;
             m_HeaderRect = headerRect;
             EditorGUI.DrawRect(m_HeaderRect, DirectorStyles.Instance.customSkin.colorAnimEditorBinding);
-
-            if (ShouldShowClipCurves(state))
+            
+            
+            var customCurveEditor = CustomTimelineEditorCache.GetCustomCurvesView(m_TrackGUI.track);
+            if (customCurveEditor != null && customCurveEditor.GetType() != typeof(CustomCurvesEditor))
+            {
+                customCurveEditor.OnDrawGUI(headerRect,trackRect);
+            }
+            else if (ShouldShowClipCurves(state))
             {
                 DrawCurveEditorsForClipsOnTrack(m_HeaderRect, m_TrackRect, state);
             }
