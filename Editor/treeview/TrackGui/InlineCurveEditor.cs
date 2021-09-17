@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -160,20 +161,17 @@ namespace UnityEditor.Timeline
             var customCurveEditor = CustomTimelineEditorCache.GetCustomCurvesView(m_TrackGUI.track);
             if (customCurveEditor != null && customCurveEditor.GetType() != typeof(CustomCurvesEditor))
             {
-                var clipGUI = UpdateLastSelectedClip(state);
-                if (clipGUI != null)
+                try
                 {
-                    var activeRange = new Vector2(state.TimeToPixel(clipGUI.clip.start), state.TimeToPixel(clipGUI.clip.end));
-                    customCurveEditor.ActiveRange = activeRange;
+                    var clipGUI = UpdateLastSelectedClip(state, false);
+                    customCurveEditor.Init(state, m_TrackGUI.track, clipGUI, m_TrackGUI.clips);
+                    customCurveEditor.OnDrawHeader(headerRect);
+                    customCurveEditor.OnDrawTrack(trackRect);
                 }
-                else
+                catch (Exception e)
                 {
-                    customCurveEditor.ActiveRange = Vector2.zero;
+                    Debug.LogException(e);
                 }
-                customCurveEditor.state = state;
-                customCurveEditor.Track = m_TrackGUI.track;
-                customCurveEditor.OnDrawHeader(headerRect);
-                customCurveEditor.OnDrawTrack(trackRect);
             }
             else if (ShouldShowClipCurves(state))
             {
@@ -233,7 +231,7 @@ namespace UnityEditor.Timeline
         }
 
         [CanBeNull]
-        TimelineClipGUI UpdateLastSelectedClip(WindowState state)
+        TimelineClipGUI UpdateLastSelectedClip(WindowState state, bool allowFallback = true)
         {
             if (Event.current.type == EventType.Layout)
             {
@@ -253,7 +251,7 @@ namespace UnityEditor.Timeline
                     }
                 }
 
-                if (m_LastSelectedClipGUI == null)
+                if (allowFallback && m_LastSelectedClipGUI == null)
                     m_LastSelectedClipGUI = m_TrackGUI.clips[0];
             }
 

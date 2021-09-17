@@ -602,7 +602,8 @@ namespace UnityEditor.Timeline
         bool CanDrawInlineCurve()
         {
             // Note: A track with animatable parameters always has inline curves.
-            return trackHasAnimatableParameters || TimelineUtility.TrackHasAnimationCurves(track);
+            return trackHasAnimatableParameters || TimelineUtility.TrackHasAnimationCurves(track) 
+                                                || (track is ICanDrawInlineCurve drawer && drawer.CanDraw());
         }
 
         float DrawInlineCurveButton(Rect rect, WindowState state)

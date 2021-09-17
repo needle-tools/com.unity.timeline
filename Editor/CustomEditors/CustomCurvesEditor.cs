@@ -1,22 +1,59 @@
-﻿using UnityEngine;
+﻿#nullable enable
+
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Timeline;
 
 namespace UnityEditor.Timeline
 {
 	public class CustomCurvesEditor
 	{
-		internal WindowState state;
+		private WindowState state = null!;
 		
-		public TrackAsset Track { get; internal set; }
-		public Vector2 ActiveRange { get; internal set; }
+		protected TrackAsset Track { get; private set; } = null!;
+		
+		
+		protected TimelineClip? SelectedClip { get; private set; }
+		protected Vector2? SelectedRange { get; private set; }
 
-		public virtual void OnDrawHeader(Rect rect)
+		internal void Init(WindowState _state, TrackAsset track, TimelineClipGUI? selectedClip, IReadOnlyList<TimelineClipGUI> clips)
+		{
+			this.state = _state;
+			this.Track = track;
+			if (selectedClip != null)
+			{
+				this.SelectedClip = selectedClip.clip;
+				SelectedRange = new Vector2(state.TimeToPixel(selectedClip.clip.start), state.TimeToPixel(selectedClip.clip.end));
+			}
+		}
+
+		protected float TimeToPixel(double time) => state.TimeToPixel(time); 
+
+		protected Rect GetRangeRect(float y, float height)
+		{
+			if(SelectedRange == null) return Rect.zero;
+			var range = SelectedRange.Value;
+			var rangeRect = new Rect
+			{
+				xMin = range.x,
+				xMax = range.y,
+				height = height,
+				y = y
+			};
+			return rangeRect;
+		}
+
+		protected internal virtual void OnDrawHeader(Rect rect)
 		{
 		}
 
-		public virtual void OnDrawTrack(Rect rect)
+		protected internal virtual void OnDrawTrack(Rect rect)
 		{
-			
+		}
+
+		protected IEnumerable<TimelineClip> EnumerateClips()
+		{
+			foreach (var clip in Track.clips) yield return clip;
 		}
 	}
 }
