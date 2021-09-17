@@ -160,7 +160,20 @@ namespace UnityEditor.Timeline
             var customCurveEditor = CustomTimelineEditorCache.GetCustomCurvesView(m_TrackGUI.track);
             if (customCurveEditor != null && customCurveEditor.GetType() != typeof(CustomCurvesEditor))
             {
-                customCurveEditor.OnDrawGUI(headerRect,trackRect);
+                var clipGUI = UpdateLastSelectedClip(state);
+                if (clipGUI != null)
+                {
+                    var activeRange = new Vector2(state.TimeToPixel(clipGUI.clip.start), state.TimeToPixel(clipGUI.clip.end));
+                    customCurveEditor.ActiveRange = activeRange;
+                }
+                else
+                {
+                    customCurveEditor.ActiveRange = Vector2.zero;
+                }
+                customCurveEditor.state = state;
+                customCurveEditor.Track = m_TrackGUI.track;
+                customCurveEditor.OnDrawHeader(headerRect);
+                customCurveEditor.OnDrawTrack(trackRect);
             }
             else if (ShouldShowClipCurves(state))
             {
@@ -208,6 +221,22 @@ namespace UnityEditor.Timeline
 
             if (Event.current.type == EventType.Layout)
             {
+                UpdateLastSelectedClip(state);
+            }
+
+            if (m_LastSelectedClipGUI == null || m_LastSelectedClipGUI.clipCurveEditor == null || m_LastSelectedClipGUI.isInvalid)
+                return;
+
+            var activeRange = new Vector2(state.TimeToPixel(m_LastSelectedClipGUI.clip.start), state.TimeToPixel(m_LastSelectedClipGUI.clip.end));
+            DrawCurveEditor(m_LastSelectedClipGUI, state, headerRect, trackRect, activeRange, m_TrackGUI.locked);
+            m_LastSelectionWasClip = true;
+        }
+
+        [CanBeNull]
+        TimelineClipGUI UpdateLastSelectedClip(WindowState state)
+        {
+            if (Event.current.type == EventType.Layout)
+            {
                 var selectedClip = SelectionManager.SelectedClipGUI().FirstOrDefault(x => x.parent == m_TrackGUI);
                 if (selectedClip != null)
                 {
@@ -228,12 +257,7 @@ namespace UnityEditor.Timeline
                     m_LastSelectedClipGUI = m_TrackGUI.clips[0];
             }
 
-            if (m_LastSelectedClipGUI == null || m_LastSelectedClipGUI.clipCurveEditor == null || m_LastSelectedClipGUI.isInvalid)
-                return;
-
-            var activeRange = new Vector2(state.TimeToPixel(m_LastSelectedClipGUI.clip.start), state.TimeToPixel(m_LastSelectedClipGUI.clip.end));
-            DrawCurveEditor(m_LastSelectedClipGUI, state, headerRect, trackRect, activeRange, m_TrackGUI.locked);
-            m_LastSelectionWasClip = true;
+            return m_LastSelectedClipGUI;
         }
 
         void DrawCurvesEditorForNothingSelected(Rect headerRect, Rect trackRect, WindowState state)
