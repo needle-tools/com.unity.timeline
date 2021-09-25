@@ -11,8 +11,6 @@ namespace UnityEditor.Timeline
 		private WindowState state = null!;
 		
 		protected TrackAsset Track { get; private set; } = null!;
-		
-		
 		protected TimelineClip? SelectedClip { get; private set; }
 		protected Vector2? SelectedRange { get; private set; }
 
@@ -27,7 +25,15 @@ namespace UnityEditor.Timeline
 			}
 		}
 
-		protected float TimeToPixel(double time) => state.TimeToPixel(time); 
+		protected float TimeToPixel(double time) => state.TimeToPixel(time);
+		protected float PixelToTime(float pixel) => state.PixelToTime(pixel);
+		protected float PixelDeltaToDeltaTime(float d) => state.PixelDeltaToDeltaTime(d);
+		protected void Repaint() => state.editorWindow.Repaint();
+
+		protected void UpdatePreview()
+		{
+			foreach(var d in state.previewedDirectors) d?.Evaluate();
+		}
 
 		protected Rect GetRangeRect(float y, float height)
 		{
