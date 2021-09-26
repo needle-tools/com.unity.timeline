@@ -163,8 +163,8 @@ namespace UnityEditor.Timeline
             {
                 try
                 {
-                    var clipGUI = UpdateLastSelectedClip(state, false);
-                    customCurveEditor.Init(state, m_TrackGUI.track, clipGUI, m_TrackGUI.clips);
+                    var selectedClip = SelectionManager.SelectedClipGUI().FirstOrDefault(x => x.parent == m_TrackGUI);
+                    customCurveEditor.Init(state, m_TrackGUI.track, selectedClip, m_TrackGUI.clips);
                     customCurveEditor.OnDrawHeader(headerRect);
                     customCurveEditor.OnDrawTrack(trackRect);
                 }

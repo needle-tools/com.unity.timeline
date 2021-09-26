@@ -23,6 +23,7 @@ namespace UnityEditor.Timeline
 				this.SelectedClip = selectedClip.clip;
 				SelectedRange = new Vector2(state.TimeToPixel(selectedClip.clip.start), state.TimeToPixel(selectedClip.clip.end));
 			}
+			else SelectedClip = null;
 		}
 
 		protected float TimeToPixel(double time) => state.TimeToPixel(time);
