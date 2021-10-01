@@ -29,10 +29,11 @@ namespace UnityEditor.Timeline
 		protected float TimeToPixel(double time) => state.TimeToPixel(time);
 		protected float PixelToTime(float pixel) => state.PixelToTime(pixel);
 		protected float PixelDeltaToDeltaTime(float d) => state.PixelDeltaToDeltaTime(d);
-		protected void Repaint() => state.editorWindow.Repaint();
+		protected void Repaint() => state.editorWindow.Repaint(); 
 
 		protected void UpdatePreview()
 		{
+			if (state?.previewedDirectors == null) return;
 			foreach(var d in state.previewedDirectors) d?.Evaluate();
 		}
 
