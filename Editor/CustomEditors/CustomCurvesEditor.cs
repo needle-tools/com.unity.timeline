@@ -24,7 +24,10 @@ namespace UnityEditor.Timeline
 				SelectedRange = new Vector2(state.TimeToPixel(selectedClip.clip.start), state.TimeToPixel(selectedClip.clip.end));
 			}
 			else SelectedClip = null;
+			OnInit();
 		}
+
+		protected virtual void OnInit(){}
 
 		protected float TimeToPixel(double time) => state.TimeToPixel(time);
 		protected float PixelToTime(float pixel) => state.PixelToTime(pixel);
