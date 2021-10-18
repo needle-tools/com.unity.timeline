@@ -1,3 +1,4 @@
+using System;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
@@ -35,5 +36,12 @@ namespace UnityEditor.Timeline
         /// </summary>
         /// <remarks>Ignores window lock mode.</remarks>>
         public abstract void ClearTimeline();
+
+        public static event Action CustomHeaderGUI;
+
+        protected void RaiseCustomHeaderGUIEvent()
+        {
+            CustomHeaderGUI?.Invoke();
+        }
     }
 }

@@ -42,6 +42,7 @@ namespace UnityEditor.Timeline
                 PlayRangeButtonGUI();
                 TimeCodeGUI();
                 ReferenceTimeGUI();
+                RaiseCustomHeaderGUIEvent();
             }
         }
 
