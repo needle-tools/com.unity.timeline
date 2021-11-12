@@ -62,7 +62,7 @@ namespace UnityEditor.Timeline
 		{
 		}
 
-		protected IEnumerable<TimelineClip> EnumerateClips()
+		public IEnumerable<TimelineClip> EnumerateClips()
 		{
 			foreach (var clip in Track.clips) yield return clip;
 		}
