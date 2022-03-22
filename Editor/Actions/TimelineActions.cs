@@ -195,9 +195,15 @@ namespace UnityEditor.Timeline
             foreach (var track in trackData)
             {
                 var newTrack = track.item.Duplicate(TimelineEditor.clipboard.exposedPropertyTable, TimelineEditor.inspectedDirector, TimelineEditor.inspectedAsset);
-                if (track.binding != null)
+                var newTracks = newTrack.GetFlattenedChildTracks().Append(newTrack);
+
+                var bindingIt = track.bindings.GetEnumerator();
+                var newTrackIt = newTracks.GetEnumerator();
+
+                while (bindingIt.MoveNext() && newTrackIt.MoveNext())
                 {
-                    BindingUtility.Bind(TimelineEditor.inspectedDirector, newTrack, track.binding);
+                    if (bindingIt.Current != null)
+                        BindingUtility.Bind(TimelineEditor.inspectedDirector, newTrackIt.Current, bindingIt.Current);
                 }
 
                 SelectionManager.Add(newTrack);
@@ -402,9 +408,7 @@ namespace UnityEditor.Timeline
         {
             if (TimelineEditor.inspectedAsset == null)
                 return false;
-            var inspectedFrame = TimeUtility.ToFrames(TimelineEditor.inspectedSequenceTime, TimelineEditor.inspectedAsset.editorSettings.frameRate);
-            inspectedFrame = Mathf.Max(0, inspectedFrame - 1);
-            TimelineEditor.inspectedSequenceTime = TimeUtility.FromFrames(inspectedFrame, TimelineEditor.inspectedAsset.editorSettings.frameRate);
+            TimelineEditor.inspectedSequenceTime = TimeUtility.PreviousFrameTime(TimelineEditor.inspectedSequenceTime, TimelineEditor.inspectedAsset.editorSettings.frameRate);
             return true;
         }
     }
@@ -419,9 +423,7 @@ namespace UnityEditor.Timeline
         {
             if (TimelineEditor.inspectedAsset == null)
                 return false;
-            var inspectedFrame = TimeUtility.ToFrames(TimelineEditor.inspectedSequenceTime, TimelineEditor.inspectedAsset.editorSettings.frameRate);
-            inspectedFrame++;
-            TimelineEditor.inspectedSequenceTime = TimeUtility.FromFrames(inspectedFrame, TimelineEditor.inspectedAsset.editorSettings.frameRate);
+            TimelineEditor.inspectedSequenceTime = TimeUtility.NextFrameTime(TimelineEditor.inspectedSequenceTime, TimelineEditor.inspectedAsset.editorSettings.frameRate);
             return true;
         }
     }
